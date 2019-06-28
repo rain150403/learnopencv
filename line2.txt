@@ -1,0 +1,239 @@
+/*
+//方法二也是一样的，也是找像素差，找到每一列中，像素差最大的那个，，这样，在行方向就会找到好多点，当点数达到一定值的时候，就进行拟合。这里采用的最小二乘拟合
+此方法没有看到检测效果
+*/
+
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int detectThreshold = 1;
+int lineNum = 1;
+bool LineDetectMethod(cv::Mat &srcImg, int detectThreshold, int lineNum, float &aLine, float &bLine, float &cLine);
+bool LineLeastSquare(const std::vector<cv::Point>& vecLinePoint, int nGap, float& faLine, float& fbLine, float& fcLine);
+
+int main(){
+	Mat src = imread("8.jpg");
+	imshow("src", src);
+	float aLine = 0.0, bLine = 0.0, cLine = 0.0;
+
+	bool testFlag = 0;
+
+	testFlag = LineDetectMethod(src, detectThreshold, lineNum, aLine, bLine, cLine);
+
+	if (testFlag == true){
+
+		Point2f  onePoint2f, twoPoint2f;  ///02110    //测横线，效果不错
+
+		onePoint2f.x = 0 + cLine*sin(0);
+		onePoint2f.y = 0 + cLine*cos(0);
+		// Point Two
+		twoPoint2f.x = src.cols + cLine*sin(0);
+		twoPoint2f.y = 0 + cLine*cos(0);
+
+		aLine = -1;
+		bLine = -tan(0);
+		cLine = int(-bLine*onePoint2f.x - aLine*onePoint2f.y);
+
+		//cvtColor(src, src, CV_GRAY2BGR);
+		line(src, Point(onePoint2f), Point(twoPoint2f), cv::Scalar(0, 255, 0), 20);
+
+		// 绘制直线
+		//Point2f  onePoint2f, twoPoint2f;    //测竖线，有些问题，不知道怎么回事
+
+		//onePoint2f.x = 0 + cLine*cos(0);
+		//onePoint2f.y = 0 + cLine*sin(0);
+		//// Point Two
+		//twoPoint2f.x = 0 + cLine*cos(0);
+		//twoPoint2f.y = src.rows + cLine*sin(0);
+
+		//aLine = -tan(0);
+		//bLine = -1;
+		//cLine = int(-bLine*onePoint2f.x - aLine*onePoint2f.y);
+
+		////cvtColor(src, src, CV_GRAY2BGR);
+		//line(src, Point(onePoint2f), Point(twoPoint2f), cv::Scalar(0, 255, 0), 10);
+	}
+	imshow("12", src);
+	cout << testFlag << endl;
+
+	waitKey(0);
+	system("pause");
+	return 0;
+}
+
+bool LineDetectMethod(cv::Mat &srcImg, int detectThreshold, int lineNum, float &aLine, float &bLine, float &cLine)
+{
+	const int grayValThr = 10;
+	const int pixelSet = detectThreshold;
+	int row = srcImg.rows;
+	int col = srcImg.cols;
+	int i = 0, j = 0;
+	int gerrMax = 0, gerrSubMax = 0;
+	int xleft1 = 0, xleft2 = 0;
+	vector<Point>  m_vecOne, m_vecTwo;
+	Point	m_temppoint;
+
+	for (i = 0; i < row; i = i + 3)
+	{
+		// 找每行像素值变化值  
+		vector<int>  grayVerdiff(col);
+		gerrMax = 0, gerrSubMax = 0;
+		xleft1 = 0, xleft2 = 0;
+		for (j = 0; j < col; j++)
+		{
+			grayVerdiff[j] = 0;   // 初始化为0
+		}
+		for (j = 1 + detectThreshold; j < col; j++)
+		{
+			grayVerdiff[j] = abs(srcImg.at<uchar>(i, j) - srcImg.at<uchar>(i, j - 1 - detectThreshold));
+		}
+		for (int j = 1; j < col; j++)
+		{
+			if (gerrMax < grayVerdiff[j])
+			{
+				gerrMax = grayVerdiff[j];
+				xleft1 = j;
+			}
+		}
+		for (int j = 1; j < xleft1 - pixelSet; j++)
+		{
+			if (gerrSubMax < grayVerdiff[j])
+			{
+				gerrSubMax = grayVerdiff[j];
+				xleft2 = j;
+			}
+		}
+		for (int j = xleft1 + pixelSet + 1; j < col; j++)
+		{
+			if (gerrSubMax < grayVerdiff[j])
+			{
+				gerrSubMax = grayVerdiff[j];
+				xleft2 = j;
+			}
+		}
+		if (gerrMax < grayValThr)
+			continue;
+		if (gerrSubMax < grayValThr)
+		{
+			m_temppoint.x = i;
+			m_temppoint.y = xleft1;
+			m_vecOne.push_back(m_temppoint);
+		}
+		else
+		{
+			if (xleft1 <= xleft2)
+			{
+				m_temppoint.x = i;
+				m_temppoint.y = xleft1;
+				m_vecOne.push_back(m_temppoint);
+				m_temppoint.x = i;
+				m_temppoint.y = xleft2;
+				m_vecTwo.push_back(m_temppoint);
+			}
+			else
+			{
+				m_temppoint.x = i;
+				m_temppoint.y = xleft2;
+				m_vecOne.push_back(m_temppoint);
+				m_temppoint.x = i;
+				m_temppoint.y = xleft1;
+				m_vecTwo.push_back(m_temppoint);
+			}
+		}
+	}
+
+	if (m_vecOne.size() > 10 && m_vecTwo.size() > 10)
+	{
+		if (0 == lineNum)
+		{
+			return LineLeastSquare(m_vecOne, 8, aLine, bLine, cLine);
+		}
+		else if (1 == lineNum)
+		{
+			return LineLeastSquare(m_vecTwo, 8, aLine, bLine, cLine);
+		}
+	}
+	else if (m_vecOne.size() > 10)
+	{
+		return LineLeastSquare(m_vecOne, 8, aLine, bLine, cLine);
+	}
+	return false;
+}
+
+//方法二也是一样的，也是找像素差，找到每一列中，像素差最大的那个，，这样，在行方向就会找到好多点，当点数达到一定值的时候，就进行拟合。这里采用的最小二乘拟合
+bool LineLeastSquare(const std::vector<cv::Point>& vecLinePoint, int nGap, float& faLine, float& fbLine, float& fcLine)
+{
+	std::vector<Point> vecTemp;
+
+	int N = vecLinePoint.size();
+	float x_mean = 0;
+	float y_mean = 0;
+	float fa = 0.0, fb = 0.0, fc = 0.0;
+	for (int i = 0; i < N; i++)
+	{
+		x_mean += vecLinePoint[i].x;
+		y_mean += vecLinePoint[i].y;
+	}
+	x_mean /= N;
+	y_mean /= N; //至此，计算出了 x y 的均值
+
+	float Dxx = 0, Dxy = 0, Dyy = 0;
+
+	for (int i = 0; i < N; i++)
+	{
+		Dxx += (vecLinePoint[i].x - x_mean) * (vecLinePoint[i].x - x_mean);
+		Dxy += (vecLinePoint[i].x - x_mean) * (vecLinePoint[i].y - y_mean);
+		Dyy += (vecLinePoint[i].y - y_mean) * (vecLinePoint[i].y - y_mean);
+	}
+	float lambda = ((Dxx + Dyy) - sqrt((Dxx - Dyy) * (Dxx - Dyy) + 4 * Dxy * Dxy)) / 2.0;
+	float den = sqrt(Dxy * Dxy + (lambda - Dxx) * (lambda - Dxx));
+
+	if (abs(den) > 0.001)
+	{
+		fa = Dxy / den;
+		fb = (lambda - Dxx) / den;
+		fc = -fa * x_mean - fb * y_mean;
+	}
+	else
+	{
+		fa = 1;
+		fb = 0;
+		fc = -x_mean;
+	}
+
+	//各点到直线距离
+	float fDistTemp = 0.0;
+	for (int i = 0; i < N; i++)
+	{
+		fDistTemp = abs(fa*vecLinePoint[i].x + fb*vecLinePoint[i].y + fc);
+		fDistTemp = fDistTemp / sqrt(fa*fa + fb*fb);
+		if (fDistTemp < nGap)
+		{
+			vecTemp.push_back(vecLinePoint[i]);
+		}
+	}
+	if (nGap >= 2 && vecTemp.size() > 20)
+	{
+		if (LineLeastSquare(vecTemp, nGap / 2, faLine, fbLine, fcLine))
+			return true;
+		else
+			return false;
+	}
+	else if (nGap < 2 && vecTemp.size() > 20)
+	{
+		faLine = fa;
+		fbLine = fb;
+		fcLine = fc;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}

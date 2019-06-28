@@ -1,0 +1,129 @@
+https://blog.csdn.net/PINBODEXIAOZHU/article/details/40817651
+OpenCV里IplImage的widthStep参数 和width参数
+
+https://jingyan.baidu.com/article/f0e83a2575571d22e5910188.html
+opencv ： widthStep vs step
+
+
+
+
+-------------------------------------
+	///////================================================================================================求最小外接矩形
+	CvMemStorage *storage = cvCreateMemStorage();
+	CvSeq *seq = NULL;
+	int cnt = cvFindContours(g_pBinralyImage_liantong, storage, &seq);
+	seq = seq->h_next;
+	double length = cvArcLength(seq);
+	double area = cvContourArea(seq);
+	CvRect rect = cvBoundingRect(seq, 1);
+	CvBox2D box = cvMinAreaRect2(seq, NULL);
+
+	IplImage *SrcImage;int
+	CvSize sz;
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	//IplImage* dst_min_rec = cvLoadImage("G:\\AA computer vision\\vs_opencv_example\\defect detecting 201706261446\\picture\\1706201245_ 33.jpg", 1);
+	IplImage* dst_min_rec = cvLoadImage(SrcPath, 1);
+	sz.width = dst_min_rec->width* picture.scale;
+	sz.height = dst_min_rec->height* picture.scale;
+
+
+
+	SrcImage = cvCreateImage(sz, dst_min_rec->depth, dst_min_rec->nChannels);
+	cvResize(dst_min_rec, SrcImage, CV_INTER_CUBIC);
+	dst_min_rec = cvCloneImage(SrcImage);  //// 前面，已经事先定义
+
+	cvFindContours(g_pBinralyImage_liantong, storage, &contour, sizeof(CvContour), CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+	for (; contour != 0; contour = contour->h_next)
+	{
+
+
+		CvBox2D rect = cvMinAreaRect2(contour, storage);
+		CvPoint2D32f rect_pts0[4];
+		cvBoxPoints(rect, rect_pts0);
+
+		//因为cvPolyLine要求点集的输入类型是CvPoint**
+		//所以要把 CvPoint2D32f 型的 rect_pts0 转换为 CvPoint 型的 rect_pts
+		//并赋予一个对应的指针 *pt
+		int npts = 4, k = 0;
+		int aaa = 0, bbb = 0;
+		CvPoint rect_pts[4], *pt = rect_pts;
+		int sum_rect_x = 0, sum_rect_y = 0;
+		int chang = 0, kuan = 0;
+
+		//printf("编号：%4d  连通区域最小外接矩形顶点坐标分别为:\n", contour_num);
+
+		//Feature_value[0] = contour_num; //特征值数组第一个数
+		Feature_value2[contour_num] = new int[num_col];
+
+
+		for (int i = 0; i<4; i++)
+		{
+			rect_pts[i] = cvPointFrom32f(rect_pts0[i]);
+			//	printf("%d %d\n", rect_pts[i].x, rect_pts[i].y);
+			////===============================================================		
+			Feature_value2[contour_num][i] = rect_pts[i].x; //特征值数组第0-3个数
+			Feature_value2[contour_num][i + 4] = rect_pts[i].y; //特征值数组第4-7个数
+
+			sum_rect_x += rect_pts[i].x;
+			sum_rect_y += rect_pts[i].y;
+			aaa = (int)sqrt((pow((rect_pts[0].x - rect_pts[1].x), 2) + pow((rect_pts[0].y - rect_pts[1].y), 2)));
+			bbb = (int)sqrt((pow((rect_pts[0].x - rect_pts[3].x), 2) + pow((rect_pts[0].y - rect_pts[3].y), 2)));
+			if (aaa<bbb)
+			{
+				k = aaa;
+				aaa = bbb;
+				bbb = k;
+			}
+
+		}
+		//printf("最小外接矩形的长为：%d，宽为：%d。面积：%d \n\n", aaa, bbb, aaa*bbb);
+		Feature_value2[contour_num][8] = aaa; //特征值数组第8个数
+		Feature_value2[contour_num][9] = bbb; //特征值数组第9个数
+		Feature_value2[contour_num][10] = aaa*bbb; //特征值数组第10个数
+		Rect_all_area = Rect_all_area + aaa*bbb; // 保存最小外接矩形总的面积
+
+		int font_face = cv::FONT_HERSHEY_COMPLEX;
+		cv::Point origin;
+		origin.x = sum_rect_x / 4;
+		origin.y = sum_rect_y / 4;
+		////数字标记
+		sprintf(number_buf, "%3d", contour_num);
+		string number_buf_string = number_buf;
+		putText(label_liantogn_dst, number_buf_string, origin, font_face, value2.font_scale, cv::Scalar(0, 255, 255), value2.font_thickness, 8, 0);
+		//画出Box
+		cvPolyLine(dst_min_rec, &pt, &npts, 1, 1, CV_RGB(255, 0, 0), 1);
+		contour_num++; //连通区域个数，用于数字标记
+	}
+	cvNamedWindow("label_liantogn_dst_result", CV_WINDOW_AUTOSIZE);//分配一个用以承载图片的窗口
+	line(label_liantogn_dst, Point(0, dst_min_rec->height*0.25), Point(dst_min_rec->width, dst_min_rec->height*0.25), Scalar(89, 90, 90), 1);
+	line(label_liantogn_dst, Point(0, dst_min_rec->height*0.5), Point(dst_min_rec->width, dst_min_rec->height*0.5), Scalar(89, 90, 90), 1);
+	line(label_liantogn_dst, Point(0, dst_min_rec->height*0.75), Point(dst_min_rec->width, dst_min_rec->height*0.75), Scalar(89, 90, 90), 1);
+
+
+	line(label_liantogn_dst, Point(dst_min_rec->width*0.25, 0), Point(dst_min_rec->width*0.25, dst_min_rec->height), Scalar(89, 90, 90), 1);
+	line(label_liantogn_dst, Point(dst_min_rec->width*0.5, 0), Point(dst_min_rec->width*0.5, dst_min_rec->height), Scalar(89, 90, 90), 1);
+	line(label_liantogn_dst, Point(dst_min_rec->width*0.75, 0), Point(dst_min_rec->width*0.75, dst_min_rec->height), Scalar(89, 90, 90), 1);
+
+	////显示原点（0，0）
+	Point p2;
+	p2.x = 10;
+	p2.y = 10;
+	//画实心点
+	circle(label_liantogn_dst, p2, 5, Scalar(0, 0, 255), -1); //第五个参数我设为-1，表明这是个实点。
+
+	imshow("label_liantogn_dst_result", label_liantogn_dst);
+	imwrite("save_Label.jpg", label_liantogn_dst);
+
+
+	printf("连通区域个数：%4d \n", contour_num);
+	cvNamedWindow("外接矩形", CV_WINDOW_AUTOSIZE);//分配一个用以承载图片的窗口
+	//cvLine(dst_min_rec, cvPoint(0, 50), cvPoint(dst_min_rec->width, 50), CV_RGB(255, 0, 0), 1);
+	cvShowImage("外接矩形", dst_min_rec);
+
+	//Mat dst_min_rec_result = cvarrToMat(dst_min_rec);
+	//imwrite("save_rect1.jpg", dst_min_rec_result);
+	cvSaveImage("save_Rectg.jpg", dst_min_rec);

@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DiffofTwoImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="move_compare_twoImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="feather.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="seedFilled.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="minAreaFeather.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="minRect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="minRectGood.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="lineDetect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="fanse.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="contour_area_sort.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="scratch_detect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="contours.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="multiContours.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="line_detect_book.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="canny_detect_trackbar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="matchTemplate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="flann.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="qingxie.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="roi_area.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tianchong_contours.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="image_enhance.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="background_delete.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="filter.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="seed_fill.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="final.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Hough_circle.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="twice_match.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="edge_subtract.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="myPixel_subtract.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="batch_statistics.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="myRight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="p.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stitch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="together.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="edgeClear.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="12.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BadWhite.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="hu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="fan.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="adaptiveThreshold.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="floodFill.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="plane_dilate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="fangong.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="equalizist.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="0520.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="skeleton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tongjigeshu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="findPeaks.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="bur.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Harris.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="kmeansMethod.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DBSCAN.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="youhua.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="colorImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="h-s.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="1dimension.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="kalman.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RGB.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="compareHist.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="final.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="kmeansMethon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

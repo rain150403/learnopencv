@@ -1,0 +1,79 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+
+using namespace std;
+using namespace cv;
+
+int main(int argc, char** argv) {
+
+	Mat src = imread("D:\\样品图片\\sample13\\front\\划痕\\00031.JPG", IMREAD_COLOR);
+	if (src.empty())
+	{
+		printf("Could not load image...");
+		return 0;
+	}
+	int n1 = src.channels();
+	printf("The depth of src is: %d\n", n1);
+
+	Mat dst;
+	cvtColor(src, dst, CV_BGR2GRAY);//第4个参数省略。。默认0
+	int n2 = src.channels();
+	printf("The depth of dst is: %d\n", n2);
+	namedWindow("Demo image", CV_WINDOW_AUTOSIZE);
+	imshow("Demo image", src);
+
+
+
+	int height = dst.rows;
+	int width = dst.cols;
+	namedWindow("output window", CV_WINDOW_AUTOSIZE);
+	imshow("output window", dst);
+
+	Mat m = Mat::zeros(height, width, CV_8UC1);
+	for (int row = 0; row < height; row++)
+	{
+		for (int col = 0; col < width; col++)
+		{
+			m.at<uchar>(row, col) = 255 - dst.at<uchar>(row, col);
+			//int gray= dst.at<uchar>(row, col);
+			//dst.at<uchar>(row, col) = 255 - gray;
+		}
+	}
+	namedWindow("singlechannel window", CV_WINDOW_AUTOSIZE);
+	imshow("singlechannel window", m);
+
+	Mat m2;
+	m2.create(src.size(), src.type());
+	int height2 = src.rows;
+	int width2 = src.cols;
+	int np = src.channels();
+
+	/*
+	for (int row = 0; row < height2; row++)
+	{
+	for (int col = 0; col < width2; col++)
+	{
+	if (np==1)
+	{
+	dst.at<uchar>(row, col) = 255 - dst.at<uchar>(row, col);
+	}
+	else if(np==3){
+	m2.at<Vec3b>(row, col)[0] = 255 - src.at<Vec3b>(row, col)[0];
+	m2.at<Vec3b>(row, col)[1] = 255 - src.at<Vec3b>(row, col)[1];
+	m2.at<Vec3b>(row, col)[2] = 255 - src.at<Vec3b>(row, col)[2];
+	}
+
+	}
+	}
+	*/
+
+	//调用api
+	bitwise_not(src, m2);
+
+
+	namedWindow("Mulchannels window", CV_WINDOW_AUTOSIZE);
+	imshow("Mulchannels window", m2);
+
+	waitKey(0);
+	return 0;
+}

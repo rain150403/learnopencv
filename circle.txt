@@ -1,0 +1,216 @@
+///检测圆的公式大概记住了，但是这个代码没调通
+
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int detectThreshold = 10;
+int detectDirection = 0;
+int lineNum = 0;
+bool CircleDetectMethod(Mat & srcImg, int detectThreshold, int detectDirection, float& xCenterPoint, float& yCenterPoint, float& Radius, int red, int green, int blue);
+
+int main(){
+	Mat src = imread("10.jpg");
+	imshow("src", src);
+	float aLine = 0.0, bLine = 0.0, cLine = 0.0;
+
+	bool testFlag = 0;
+
+	testFlag = CircleDetectMethod(src, detectThreshold, detectDirection, xCenterPoint, yCenterPoint, Radius, red, green, blue);
+
+	imshow("12", src);
+	cout << testFlag << endl;
+
+	waitKey(0);
+	system("pause");
+	return 0;
+}
+
+bool CircleDetectMethod(Mat & srcImg, int detectThreshold, int detectDirection, float& xCenterPoint, float& yCenterPoint, float& Radius, int red, int green, int blue)
+{
+	Point  rectLTPoint;
+	rectLTPoint.x = centerPoint.x - int(float(rectWidth) / 2.0);
+	rectLTPoint.y = centerPoint.y - int(float(rectHeight) / 2.0);
+	Mat roiImg = AdjustImage[camIndex](Rect(rectLTPoint.x, rectLTPoint.y, rectWidth, rectHeight)).clone();
+	int row = roiImg.rows;
+	int col = roiImg.cols;
+
+	Mat grayImg = roiImg;
+	/*Mat grayImg = Mat::zeros(row, col, CV_8UC1);
+	cvtColor(roiImg, grayImg, CV_BGR2GRAY);*/
+
+	const int grayThreshold = 2;
+	const float PI2 = 2 * 3.1415926535898;
+	const int cirpixelNum = 120;    //////
+	const int thetaCoef = 360 / cirpixelNum;
+
+	int i = 0, j = 0, k = 0;
+	float  radius = 0.0;
+	float  radiusMax = float(min(row, col)) / 2;
+	float  radiusMin = radiusMax * 0.6;
+	float  xcirCenter = float(row) / 2;
+	float  ycirCenter = float(col) / 2;
+	vector<Point>   cirPoint(cirpixelNum);
+	//typedef complex<int>  MYPOINT;
+	//vector<Point>   grayMaxPoint(cirpixelNum);
+	vector<Point>   grayMaxPoint;
+	int  xypNum = abs(radiusMax - radiusMin - 3);
+	vector<int>     xi(xypNum);
+	vector<int>     yi(xypNum);
+	vector<int>     graydiff(xypNum);
+	vector<int>     grayVal(xypNum);
+	int             grayMax = 0;
+	int             pointNumCount = 0;
+
+
+	for (k = 0; k < cirpixelNum; k++)
+	{
+		for (i = 0; i < xypNum; i++)
+		{
+			xi[i] = int(xcirCenter + (radiusMin + float(i)) * sin(float(k * thetaCoef) * PI2 / 360.0) + 0.5);
+			yi[i] = int(ycirCenter + (radiusMin + float(i)) * cos(float(k * thetaCoef) * PI2 / 360.0) + 0.5);
+			grayVal[i] = grayImg.at<uchar>(xi[i], yi[i]);
+			graydiff[i] = 0;
+		}
+		grayMax = 0;
+		int xptem = 0, yptem = 0;
+		Point ptem;
+		for (i = 1 + detectThreshold; i < xypNum; i++)
+		{
+			graydiff[i] = abs(grayVal[i] - grayVal[i - 1 - detectThreshold]);
+			if (grayMax < graydiff[i])
+			{
+				grayMax = graydiff[i];
+				xptem = xi[i];
+				yptem = yi[i];
+				ptem.x = xi[i];
+				ptem.y = yi[i];
+			}
+		}
+		if (grayMax > grayThreshold)
+		{
+			grayMaxPoint.push_back(ptem);
+			//grayMaxPoint[pointNumCount].x = xptem;
+			//grayMaxPoint[pointNumCount].y = yptem;
+			pointNumCount++;
+		}
+	}
+	//if (pointNumCount < 5)
+	if (pointNumCount < cirpixelNum / 3)
+	{
+		//putText(srcImg, "No Circle Detect!", cv::Point(rectLTPoint.x,
+		//	rectLTPoint.y + int(float(rectHeight) / 2)), CV_FONT_HERSHEY_COMPLEX, 1,
+		//	cv::Scalar(red, green, blue), 3);//圆检测出错提示
+		//putText(srcImg, "Please Reselet the Area 1.",
+		//	cv::Point(rectLTPoint.x, rectLTPoint.y + 50 + int(float(rectHeight) / 2)),
+		//	CV_FONT_HERSHEY_COMPLEX, 1, cv::Scalar(red, green, blue), 3);//圆检测出错提示
+		xCenterPoint = rectLTPoint.y;
+		yCenterPoint = rectLTPoint.x;
+		return  false;
+	}
+	else
+	{
+		// 最小二乘法拟合圆  
+		float circx = 0.0, circy = 0.0;
+		radius = 0.0;
+
+		float sum_x = 0.0f, sum_y = 0.0f;
+		float sum_x2 = 0.0f, sum_y2 = 0.0f;
+		float sum_x3 = 0.0f, sum_y3 = 0.0f;
+		float sum_xy = 0.0f, sum_x1y2 = 0.0f, sum_x2y1 = 0.0f;
+
+		int N = pointNumCount;
+		for (int i = 0; i < N; i++)
+		{
+			float x = grayMaxPoint[i].x;
+			float y = grayMaxPoint[i].y;
+			float x2 = x * x;
+			float y2 = y * y;
+			sum_x += x;
+			sum_y += y;
+			sum_x2 += x2;
+			sum_y2 += y2;
+			sum_x3 += x2 * x;
+			sum_y3 += y2 * y;
+			sum_xy += x * y;
+			sum_x1y2 += x * y2;
+			sum_x2y1 += x2 * y;
+		}
+
+		float C, D, E, G, H;
+		float a, b, c;
+
+		C = N * sum_x2 - sum_x * sum_x;
+		D = N * sum_xy - sum_x * sum_y;
+		E = N * sum_x3 + N * sum_x1y2 - (sum_x2 + sum_y2) * sum_x;
+		G = N * sum_y2 - sum_y * sum_y;
+		H = N * sum_x2y1 + N * sum_y3 - (sum_x2 + sum_y2) * sum_y;
+		a = (H * D - E * G) / (C * G - D * D);
+		b = (H * C - E * D) / (D * D - G * C);
+		c = -(a * sum_x + b * sum_y + sum_x2 + sum_y2) / N;
+
+		circx = a / (-2);
+		circy = b / (-2);
+		radius = sqrt(a * a + b * b - 4 * c) / 2;
+
+		//各点到圆心距离
+		vector<int>     nradius(pointNumCount);
+		for (int i = 0; i < pointNumCount; i++)
+		{
+			float x = grayMaxPoint[i].x;
+			float y = grayMaxPoint[i].y;
+			nradius[i] = sqrt((x - circx)*(x - circx) + (y - circy)*(y - circy));
+			if (abs(radius - nradius[i])>radius*0.2)
+				return false;
+		}
+		/*float circx = 0.0, circy = 0.0;
+		float radius = 0.0;
+		if (!CircleLeastSquare(grayMaxPoint, 12, circx, circy, radius))
+		return false;*/
+
+		yCenterPoint = circy + rectLTPoint.x;
+		xCenterPoint = circx + rectLTPoint.y;
+		float xPoint = 0.0, yPoint = 0.0;
+		float xyoffset = 10.0;
+		for (int theta = 0; theta < 36; theta++)
+		{
+			theta = theta + 2 * 3.141593 * 10 / 360;
+			yPoint = int(yCenterPoint + radius*cos(theta));
+			xPoint = int(xCenterPoint + radius*sin(theta));
+			// 圆上的点在图像外的情况  
+			if (xPoint <= xyoffset || xPoint >= srcImg.rows - xyoffset || yPoint >= srcImg.cols - xyoffset || yPoint <= xyoffset)
+			{
+				//putText(srcImg, "No Circle Detect!", cv::Point(rectLTPoint.x, rectLTPoint.y + int(float(rectHeight) / 2)),
+				//	CV_FONT_HERSHEY_COMPLEX, 1, cv::Scalar(red, green, blue), 3);   //圆检测出错提示
+				//putText(srcImg, "Please Reselet the Area 2.",
+				//	cv::Point(rectLTPoint.x, rectLTPoint.y + 50 + int(float(rectHeight) / 2)), CV_FONT_HERSHEY_COMPLEX, 1,
+				//	cv::Scalar(red, green, blue), 3);   //圆检测出错提示  
+
+				yCenterPoint = rectLTPoint.x;
+				xCenterPoint = rectLTPoint.y;
+				return false;
+			}
+
+		}
+
+		/*circle(srcImg, Point(yCenterPoint, xCenterPoint), radius, Scalar(red, green, blue), 3, 8, 0);
+		circle(srcImg, Point(yCenterPoint, xCenterPoint), radius, Scalar(red, green, blue), 3, 8, 0);*/
+		Radius = radius;
+		return true;
+	}
+}
+
+
+//应该是通过圆心的距离来判断两个圆的距离
+void  DistPoint2Point(cv::Mat &srcImg, float &x1CenterPoint, float &y1CenterPoint, float& x2CenterPoint, float& y2CenterPoint,
+	float &resultDist, int Red, int Green, int Blue)
+{
+	resultDist = (x1CenterPoint - x2CenterPoint)*(x1CenterPoint - x2CenterPoint) + (y1CenterPoint - y2CenterPoint)*(y1CenterPoint - y2CenterPoint);
+	resultDist = sqrt(resultDist);
+}
+
+
